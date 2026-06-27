@@ -1,0 +1,3 @@
+- IMPLEMENTATION_PLAN.mdの内容を元に実装を進める
+- css, scssなどのスタイルファイルはsrc/style/ディレクトリ内に配置する。
+- コンポーネントファイルはsrc/components/ディレクトリに配置し、コンポーネントごとに分割してファイルを作成する。

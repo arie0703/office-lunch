@@ -1,0 +1,522 @@
+:root {
+  color: #1e2430;
+  background: #f5f7f4;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background:
+    linear-gradient(135deg, rgba(242, 247, 235, 0.9), rgba(249, 250, 246, 0.9)),
+    #f5f7f4;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #5d6d5f;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 8vw, 4rem);
+  line-height: 1;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: 1.15rem;
+}
+
+.month-switcher,
+.section-heading,
+.form-actions {
+  display: flex;
+  align-items: center;
+}
+
+.month-switcher {
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.month-switcher strong {
+  min-width: 120px;
+  text-align: center;
+}
+
+.icon-button,
+.text-button,
+.primary-button,
+.danger-button {
+  border: 0;
+  border-radius: 8px;
+  min-height: 40px;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.icon-button {
+  width: 40px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(34, 44, 34, 0.12);
+}
+
+.icon-button:hover,
+.text-button:hover,
+.primary-button:hover,
+.danger-button:hover {
+  transform: translateY(-1px);
+}
+
+.text-button {
+  background: #e7ece2;
+  color: #233125;
+  padding: 0 14px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-card,
+.calendar-panel,
+.shop-stats-panel,
+.record-panel {
+  border: 1px solid #dde5d8;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 16px 44px rgba(35, 49, 37, 0.08);
+}
+
+.summary-card {
+  min-height: 112px;
+  padding: 18px;
+}
+
+.summary-card span,
+.summary-card small {
+  color: #657164;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+.summary-card small {
+  display: block;
+  margin-top: 6px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.95fr) minmax(360px, 1.05fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.calendar-panel,
+.shop-stats-panel,
+.record-panel {
+  padding: 20px;
+}
+
+.shop-stats-panel {
+  margin-bottom: 20px;
+}
+
+.shop-stats-list {
+  display: grid;
+  gap: 8px;
+}
+
+.shop-stat-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(56px, 0.4fr) minmax(128px, 0.8fr) minmax(140px, 0.9fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid #e4eadf;
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 10px 12px;
+}
+
+.shop-stat-row span {
+  color: #5f6b5d;
+  font-size: 0.92rem;
+}
+
+.section-heading {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.section-heading p {
+  margin: 4px 0 0;
+  color: #657164;
+}
+
+.weekday-row,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekday-row {
+  margin-bottom: 8px;
+  color: #6c776b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendar-grid {
+  gap: 6px;
+}
+
+.date-cell {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 1px solid #e2e8dc;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #202820;
+  padding: 8px;
+}
+
+.date-cell:hover {
+  border-color: #8ea36e;
+}
+
+.date-cell.muted {
+  color: #a0a8a0;
+  background: #f3f5f1;
+}
+
+.date-cell.selected {
+  border-color: #496c2f;
+  background: #eff6e8;
+  box-shadow: inset 0 0 0 1px #496c2f;
+}
+
+.date-cell.today span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #223125;
+  color: #ffffff;
+}
+
+.date-cell i {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d67b32;
+}
+
+.date-cell.recorded-eat_out i {
+  background: #e05a4e;
+}
+
+.date-cell.recorded-takeout i {
+  background: #4a90d9;
+}
+
+.date-cell.recorded-home i {
+  background: #5aa06a;
+}
+
+.record-form {
+  display: grid;
+  gap: 16px;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend,
+.field span {
+  display: block;
+  margin-bottom: 8px;
+  color: #3a4639;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #edf2e8;
+}
+
+.segmented-control button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #526050;
+}
+
+.segmented-control button.active {
+  background: #ffffff;
+  color: #203022;
+  box-shadow: 0 1px 3px rgba(35, 49, 37, 0.14);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid #d8e1d1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e2430;
+  padding: 12px;
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #496c2f;
+  box-shadow: 0 0 0 3px rgba(73, 108, 47, 0.16);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.shop-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.8fr);
+  gap: 14px;
+}
+
+.star-row {
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-row button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: #c6cdbf;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.star-row button.filled {
+  color: #d9822b;
+}
+
+.photo-preview,
+.photo-placeholder {
+  border: 1px dashed #cdd8c5;
+  border-radius: 8px;
+  background: #f7f9f4;
+}
+
+.photo-preview {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.photo-preview img {
+  width: 100%;
+  max-height: 280px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.photo-preview .text-button {
+  justify-self: start;
+}
+
+.photo-placeholder {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  color: #7a8578;
+}
+
+.status-message {
+  margin: 0;
+  border-radius: 8px;
+  background: #eef5e8;
+  color: #334830;
+  padding: 12px;
+}
+
+.form-actions {
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.primary-button,
+.danger-button {
+  padding: 0 22px;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: #2f512a;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(47, 81, 42, 0.2);
+}
+
+.danger-button {
+  background: #f4e7e1;
+  color: #8b321d;
+}
+
+.selected-date {
+  display: block;
+  margin-top: 16px;
+  color: #768074;
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.empty-state {
+  margin: 0;
+  color: #657164;
+}
+
+@media (max-width: 880px) {
+  .top-bar,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    display: grid;
+    align-items: start;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-stat-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .shop-stat-row strong {
+    grid-column: 1 / -1;
+  }
+
+  .workspace {
+    display: grid;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    width: min(100% - 20px, 1180px);
+    padding: 18px 0;
+  }
+
+  .calendar-panel,
+  .record-panel,
+  .summary-card {
+    padding: 14px;
+  }
+
+  .date-cell {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+
+  .date-cell.today span {
+    width: 23px;
+    height: 23px;
+  }
+
+  .form-row,
+  .segmented-control {
+    grid-template-columns: 1fr;
+  }
+
+  .month-switcher {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
