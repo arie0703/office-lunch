@@ -9,7 +9,7 @@ import {
   moveMonth,
 } from './dateUtils';
 import { deleteRecord, getAllRecords, getAllShops, saveRecord, saveShop } from './storage';
-import type { LunchCategory, LunchFormState, LunchPhoto, LunchRecord, Shop } from './types';
+import type { LunchCategory, LunchFormState, LunchPhoto, LunchRecord, Shop, ShopCategory } from './types';
 
 const CATEGORY_LABELS: Record<LunchCategory, string> = {
   eat_out: '外食',
@@ -89,6 +89,20 @@ export const App = () => {
   );
 
   const shopsById = useMemo(() => new Map(shops.map((shop) => [shop.id, shop])), [shops]);
+
+  // カテゴリ別の店リスト（外食・購入それぞれ独立）
+  const shopsByCategory = useMemo(
+    () => ({
+      eat_out: shops.filter((shop) => shop.category === 'eat_out'),
+      takeout: shops.filter((shop) => shop.category === 'takeout'),
+    }),
+    [shops],
+  );
+
+  const currentCategoryShops =
+    form.category === 'eat_out' || form.category === 'takeout'
+      ? shopsByCategory[form.category]
+      : [];
 
   const selectedRecord = recordsByDate.get(selectedDateKey);
   const selectedDate = new Date(`${selectedDateKey}T00:00:00`);
@@ -182,6 +196,19 @@ export const App = () => {
         const createdShops: Shop[] = [];
         const now = new Date().toISOString();
 
+        // v2 → v3: category フィールドがない既存 Shop に category を付与
+        const migratedShops: Shop[] = [];
+        for (const shop of storedShops) {
+          if (!shop.category) {
+            const migratedShop: Shop = { ...shop, category: 'eat_out' };
+            migratedShops.push(migratedShop);
+            await saveShop(migratedShop);
+            shopsByName.set(normalizeShopName(migratedShop.name), migratedShop);
+          } else {
+            migratedShops.push(shop);
+          }
+        }
+
         for (const record of storedRecords) {
           if (record.category === 'home' || record.shopId || !record.shopName) {
             migratedRecords.push(record);
@@ -191,9 +218,11 @@ export const App = () => {
           const normalizedShopName = normalizeShopName(record.shopName);
           let shop = shopsByName.get(normalizedShopName);
           if (!shop) {
+            const shopCategory: ShopCategory = record.category === 'takeout' ? 'takeout' : 'eat_out';
             shop = {
               id: createId(),
               name: normalizedShopName,
+              category: shopCategory,
               createdAt: now,
               updatedAt: now,
             };
@@ -212,7 +241,7 @@ export const App = () => {
           await saveRecord(migratedRecord);
         }
 
-        setShops([...storedShops, ...createdShops].sort((a, b) => a.name.localeCompare(b.name, 'ja')));
+        setShops([...migratedShops, ...createdShops].sort((a, b) => a.name.localeCompare(b.name, 'ja')));
         setRecords(migratedRecords.sort((a, b) => a.date.localeCompare(b.date)));
       } catch {
         setStatusMessage('保存済みデータの読み込みに失敗しました。');
@@ -240,13 +269,30 @@ export const App = () => {
   };
 
   const handleCategoryChange = (category: LunchCategory) => {
-    setForm((current) => ({
-      ...current,
-      category,
-      shopId: category === 'home' ? NEW_SHOP_VALUE : current.shopId,
-      newShopName: category === 'home' ? '' : current.newShopName,
-      shopName: category === 'home' ? '' : current.shopName,
-    }));
+    setForm((current) => {
+      if (category === 'home') {
+        return {
+          ...current,
+          category,
+          shopId: NEW_SHOP_VALUE,
+          newShopName: '',
+          shopName: '',
+        };
+      }
+
+      // 切り替え先カテゴリの店リストに現在の shopId が存在するか確認
+      const targetShops = shopsByCategory[category as 'eat_out' | 'takeout'];
+      const shopStillValid =
+        current.shopId !== NEW_SHOP_VALUE && targetShops.some((s) => s.id === current.shopId);
+
+      return {
+        ...current,
+        category,
+        shopId: shopStillValid ? current.shopId : NEW_SHOP_VALUE,
+        newShopName: shopStillValid ? '' : current.newShopName,
+        shopName: shopStillValid ? current.shopName : '',
+      };
+    });
   };
 
   const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -296,12 +342,17 @@ export const App = () => {
     let shopForRecord: Shop | undefined = selectedShop;
 
     if (isShopRequired && form.shopId === NEW_SHOP_VALUE) {
-      const existingShop = shops.find((shop) => normalizeShopName(shop.name) === newShopName);
+      const existingShop = shops.find(
+        (shop) =>
+          shop.category === form.category &&
+          normalizeShopName(shop.name) === newShopName,
+      );
       shopForRecord =
         existingShop ??
         {
           id: createId(),
           name: newShopName,
+          category: form.category as ShopCategory,
           createdAt: now,
           updatedAt: now,
         };
@@ -540,8 +591,8 @@ export const App = () => {
                         }));
                       }}
                     >
-                      {shops.length > 0 ? (
-                        shops.map((shop) => (
+                      {currentCategoryShops.length > 0 ? (
+                        currentCategoryShops.map((shop) => (
                           <option key={shop.id} value={shop.id}>
                             {shop.name}
                           </option>
@@ -549,7 +600,7 @@ export const App = () => {
                       ) : (
                         <option value={NEW_SHOP_VALUE}>新しい店を追加</option>
                       )}
-                      {shops.length > 0 ? <option value={NEW_SHOP_VALUE}>新しい店を追加</option> : null}
+                      {currentCategoryShops.length > 0 ? <option value={NEW_SHOP_VALUE}>新しい店を追加</option> : null}
                     </select>
                   </label>
 
