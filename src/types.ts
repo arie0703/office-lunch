@@ -21,9 +21,12 @@ export type LunchRecord = {
   updatedAt: string;
 };
 
+export type ShopCategory = 'eat_out' | 'takeout';
+
 export type Shop = {
   id: string;
   name: string;
+  category: ShopCategory;
   createdAt: string;
   updatedAt: string;
 };

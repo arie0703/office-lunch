@@ -1,7 +1,7 @@
 import type { LunchRecord, Shop } from './types';
 
 const DB_NAME = 'office-lunch-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const RECORD_STORE_NAME = 'lunch-records';
 const SHOP_STORE_NAME = 'shops';
 
@@ -9,15 +9,31 @@ const openDatabase = () =>
   new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
+
       if (!db.objectStoreNames.contains(RECORD_STORE_NAME)) {
         const store = db.createObjectStore(RECORD_STORE_NAME, { keyPath: 'id' });
         store.createIndex('date', 'date', { unique: true });
       }
+
       if (!db.objectStoreNames.contains(SHOP_STORE_NAME)) {
         const store = db.createObjectStore(SHOP_STORE_NAME, { keyPath: 'id' });
-        store.createIndex('name', 'name', { unique: true });
+        store.createIndex('name', 'name', { unique: false });
+        store.createIndex('category', 'category', { unique: false });
+      } else if (event.oldVersion < 3) {
+        // v2 → v3: name インデックスを unique: false に変更し category インデックスを追加
+        const transaction = request.transaction!;
+        const store = transaction.objectStore(SHOP_STORE_NAME);
+
+        if (store.indexNames.contains('name')) {
+          store.deleteIndex('name');
+        }
+        store.createIndex('name', 'name', { unique: false });
+
+        if (!store.indexNames.contains('category')) {
+          store.createIndex('category', 'category', { unique: false });
+        }
       }
     };
 
